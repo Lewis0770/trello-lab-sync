@@ -58,9 +58,23 @@ def create_card(list_id, name, desc):
     response.raise_for_status()
     return response.json()
 
+def get_board_info(board_id):
+    url = f"https://api.trello.com/1/boards/{board_id}"
+    params = {"key": API_KEY, "token": TOKEN}
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return response.json()
+
 def main():
     try:
         print(f"Using Board ID: {BOARD_ID}")
+        
+        # Get board info to verify the ID
+        print("Fetching board information...")
+        board_info = get_board_info(BOARD_ID)
+        print(f"Board name: {board_info.get('name')}")
+        print(f"Board ID from API: {board_info.get('id')}")
+        
         print("Fetching existing lists...")
         trello_lists = get_lists(BOARD_ID)
         print(f"Found {len(trello_lists)} existing lists")
