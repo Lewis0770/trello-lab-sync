@@ -7,6 +7,14 @@ API_KEY = os.getenv("TRELLO_API_KEY")
 TOKEN = os.getenv("TRELLO_TOKEN")
 BOARD_ID = os.getenv("TRELLO_BOARD_ID")
 
+# Check if all required environment variables are set
+if not all([API_KEY, TOKEN, BOARD_ID]):
+    print("Error: Missing required environment variables")
+    print(f"API_KEY: {'✓' if API_KEY else '✗'}")
+    print(f"TOKEN: {'✓' if TOKEN else '✗'}")
+    print(f"BOARD_ID: {'✓' if BOARD_ID else '✗'}")
+    exit(1)
+
 # Auto-generated names and description
 timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 LIST_NAME = f"AutoList {timestamp}"
@@ -47,17 +55,25 @@ def create_card(list_id, name, desc):
     return response.json()
 
 def main():
-    print("Fetching existing lists...")
-    trello_lists = get_lists(BOARD_ID)
+    try:
+        print("Fetching existing lists...")
+        trello_lists = get_lists(BOARD_ID)
+        
+        # Always create a new list (as per request)
+        print(f"Creating new list: {LIST_NAME}")
+        list_id = create_list(BOARD_ID, LIST_NAME)
+        
+        print(f"Creating card in list '{LIST_NAME}'...")
+        card = create_card(list_id, CARD_NAME, CARD_DESC)
+        
+        print(f"✅ Created card: {card.get('url', '[No URL]')}")
+        
+    except requests.exceptions.RequestException as e:
+        print(f"❌ API request failed: {e}")
+        exit(1)
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+        exit(1)
 
-    # Always create a new list (as per request)
-    print(f"Creating new list: {LIST_NAME}")
-    list_id = create_list(BOARD_ID, LIST_NAME)
-
-    print(f"Creating card in list '{LIST_NAME}'...")
-    card = create_card(list_id, CARD_NAME, CARD_DESC)
-
-    print(f"✅ Created card: {card.get('url', '[No URL]')}")
-
-if __name__ == "__main__":
+if __name__ == "__main__":  # Fixed: double underscores, not asterisks
     main()
