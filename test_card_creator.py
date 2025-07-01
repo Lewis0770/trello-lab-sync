@@ -30,34 +30,40 @@ def get_lists(board_id):
 
 def create_list(board_id, list_name):
     url = "https://api.trello.com/1/lists"
-    params = {
+    data = {
         "key": API_KEY,
         "token": TOKEN,
         "idBoard": board_id,
         "name": list_name,
         "pos": "bottom"
     }
-    response = requests.post(url, params=params)
+    print(f"Attempting to create list with board ID: {board_id}")
+    response = requests.post(url, data=data)  # Using data instead of params
+    print(f"Response status: {response.status_code}")
+    if response.status_code != 200:
+        print(f"Response text: {response.text}")
     response.raise_for_status()
     return response.json()["id"]
 
 def create_card(list_id, name, desc):
     url = "https://api.trello.com/1/cards"
-    params = {
+    data = {
         "key": API_KEY,
         "token": TOKEN,
         "idList": list_id,
         "name": name,
         "desc": desc
     }
-    response = requests.post(url, params=params)
+    response = requests.post(url, data=data)  # Using data instead of params
     response.raise_for_status()
     return response.json()
 
 def main():
     try:
+        print(f"Using Board ID: {BOARD_ID}")
         print("Fetching existing lists...")
         trello_lists = get_lists(BOARD_ID)
+        print(f"Found {len(trello_lists)} existing lists")
         
         # Always create a new list (as per request)
         print(f"Creating new list: {LIST_NAME}")
