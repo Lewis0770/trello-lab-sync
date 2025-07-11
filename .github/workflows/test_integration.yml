@@ -2,8 +2,7 @@ name: Trello Integration Test
 
 on:
   schedule:
-    - cron: "*/10 * * * *"  # Every 10 minutes
-  workflow_dispatch:        # Optional manual trigger
+ -  workflow_dispatch:        # Optional manual trigger
 
 jobs:
   run-test:
